@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:news_app/logic/app_strings.dart';
 import 'package:news_app/logic/auto_direction.dart';
+import 'package:news_app/logic/url_launcher.dart';
 
 import '../logic/date_formating.dart';
 import '../logic/publisher_logo.dart';
@@ -139,7 +140,7 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
                           Row(
                             children: [
                               PublisherLogo(
-                                publisher: details.publisher,
+                                publisher: PublisherFilter(details.publisher),
                                 hw: 40,
                               ),
                               const SizedBox(width: 8),
@@ -156,24 +157,15 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
                                           .primary,
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        timeAgo(details.published_at),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium,
-                                      ),
-                                      Text(
-                                        details.authors.isNotEmpty == true
-                                            ? '  ∙  بقلم: ${details.authors.join(' - ')}'
-                                            : '',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                                  Text(
+                                    [
+                                      timeAgo(details.published_at),
+                                      if (details.authors.isNotEmpty)
+                                        'بقلم: ${details.authors.join(' - ')}',
+                                    ].join('  |  '),
+                                    style: Theme.of(context).textTheme.labelMedium,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
@@ -183,21 +175,27 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
                         ],
                       ),
                     ),
-                    Text(
-                      _expanded ? details.body : details.incipit,
-                      textDirection: directionOf(details.body),
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 400),
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        _expanded ? details.body : details.incipit,
+                        textDirection: directionOf(details.body),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
                     SizedBox(),
-                    _expanded
-                        ? Text(
-                            maxLines: 2,
-                            details.original_url,
-                            textDirection: directionOf(details.original_url),
-                            style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        : Container(),
+                    if (_expanded)
+                      GestureDetector(
+                        onTap: () => openUrl(details.original_url),
+                        child: Text(
+                          maxLines: 2,
+                          details.original_url,
+                          textDirection: directionOf(details.original_url),
+                          style: Theme.of(context).textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
 
                     Center(
                       child: FilledButton.icon(
