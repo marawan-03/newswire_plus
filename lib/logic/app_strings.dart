@@ -13,7 +13,8 @@ class AppStrings {
       'light': 'Light',
       'dark': 'Dark',
       'more': 'More',
-      'less': 'Less'
+      'less': 'Less',
+      'open source': 'Open Source'
     },
     'ar': {
       'news': 'الأخبار',
@@ -26,7 +27,8 @@ class AppStrings {
       'light': 'فاتح',
       'dark': 'غامق',
       'more': 'أقرأ المزيد',
-      'less': 'أقرأ أقل'
+      'less': 'أقرأ أقل',
+      'open source': 'فتح المصدر'
     },
   };
 

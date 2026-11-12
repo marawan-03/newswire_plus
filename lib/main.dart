@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:news_app/app_core.dart';
+import 'package:news_app/shimmers/article_detailes_shimmer.dart';
 import 'package:news_app/theme/app_theme.dart';
 
 import 'controllers/font_controller.dart';

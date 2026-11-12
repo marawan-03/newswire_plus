@@ -20,7 +20,6 @@ class _NewsPageState extends State<NewsPage> {
 
   final List<News> _articles = [];
   bool _isLoading = false;
-  bool _hasMore = true;
   String? _error;
   String? _cursor;
 
@@ -31,7 +30,7 @@ class _NewsPageState extends State<NewsPage> {
 
     _scrollController.addListener(() {
       final pos = _scrollController.position;
-      if (pos.pixels >= pos.maxScrollExtent - 300) {
+      if (pos.pixels >= pos.maxScrollExtent - 600) {
         _loadMore();
       }
     });
@@ -44,7 +43,7 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Future<void> _refresh() async {
-    if (_isLoading) return; // a page is already loading
+    if (_isLoading) return;
 
     try {
       final result = await _service.fetchNews(cursor: null);
@@ -55,7 +54,6 @@ class _NewsPageState extends State<NewsPage> {
           ..clear()
           ..addAll(result.articles);
         _cursor = result.nextCursor;
-        _hasMore = result.hasMore && result.nextCursor != null;
         _error = null;
       });
     } catch (e) {
@@ -66,7 +64,7 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Future<void> _loadMore() async {
-    if (_isLoading || !_hasMore) return;
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
@@ -80,7 +78,6 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {
         _articles.addAll(result.articles);
         _cursor = result.nextCursor;
-        _hasMore = result.hasMore && result.nextCursor != null;
       });
     } catch (e) {
       if (!mounted) return;
@@ -101,7 +98,7 @@ class _NewsPageState extends State<NewsPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('error:\n$_error', textAlign: TextAlign.center),
+            // Text('error:\n$_error', textAlign: TextAlign.center),
             TextButton(onPressed: _loadMore, child: const Text('Retry')),
           ],
         ),
@@ -129,12 +126,6 @@ class _NewsPageState extends State<NewsPage> {
                   onPressed: _loadMore,
                   child: const Text('Error, tap to retry'),
                 ),
-              );
-            }
-            if (!_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(child: Text('No more news')),
               );
             }
             return const SizedBox.shrink();

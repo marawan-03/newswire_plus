@@ -37,6 +37,6 @@ String PublisherFilter(String publisher){
   if(publisher == '新华网')return 'وكالة أنباء شينخوا';
   if(publisher == 'Euronews.com')return 'Euronews';
   if(publisher == 'الموقع الرسمي للنادي الأهلي المصري')return 'النادي الأهلي';
-  if(publisher == 'https://inews.ma/')return 'I News';
+  if(publisher == 'inews.ma')return 'I News';
   return publisher;
 }

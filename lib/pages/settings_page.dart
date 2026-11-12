@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../components/theme_preview_card.dart';
 import '../controllers/font_controller.dart';
 import '../controllers/language_controller.dart';
 import '../controllers/theme_controller.dart';
 import '../logic/app_strings.dart';
-
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -65,6 +65,20 @@ class SettingsPage extends StatelessWidget {
             listenable: fontController,
             builder: (context, _) => SegmentedButton<FontSizeOption>(
               showSelectedIcon: false,
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Theme.of(context).colorScheme.primary;
+                  }
+                  return Colors.transparent;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Theme.of(context).colorScheme.surface;
+                  }
+                  return Theme.of(context).colorScheme.secondary;
+                }),
+              ),
               segments: const [
                 ButtonSegment(
                   value: FontSizeOption.small,
@@ -124,7 +138,7 @@ class SettingsPage extends StatelessWidget {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

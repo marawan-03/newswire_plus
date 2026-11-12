@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:news_app/logic/app_strings.dart';
 import 'package:news_app/logic/auto_direction.dart';
 import 'package:news_app/logic/url_launcher.dart';
+import 'package:news_app/shimmers/article_detailes_shimmer.dart';
 
 import '../logic/date_formating.dart';
 import '../logic/publisher_logo.dart';
@@ -21,12 +22,16 @@ class ArticleDetailsPage extends StatefulWidget {
 
 class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
   bool _expanded = false;
+  ArticleDetails? _details;
   late Future<ArticleDetails> _future;
 
   @override
   void initState() {
     super.initState();
     _future = NewsService().fetchDetails((widget.article.uuid));
+    _future.then((d) {
+      if (mounted) setState(() => _details = d);
+    });
   }
 
   @override
@@ -55,7 +60,7 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: ArticleDetailsShimmer());
           }
           if (snapshot.hasError) {
             return Center(child: Text('error:\n${snapshot.error}'));
@@ -184,46 +189,6 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
-                    SizedBox(),
-                    if (_expanded)
-                      GestureDetector(
-                        onTap: () => openUrl(details.original_url),
-                        child: Text(
-                          maxLines: 2,
-                          details.original_url,
-                          textDirection: directionOf(details.original_url),
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-
-                    Center(
-                      child: FilledButton.icon(
-                        onPressed: () => setState(() => _expanded = !_expanded),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 10,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-
-                        iconAlignment: IconAlignment.end,
-                        icon: Icon(
-                          _expanded
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                          color: Theme.of(context).colorScheme.secondary,
-                          size: 20,
-                        ),
-                        label: Text(
-                          AppStrings.of(context, _expanded ? 'less' : 'more'),
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
-                      ),
-                    ),
                     SizedBox(height: 24),
                   ],
                 ),
@@ -231,6 +196,50 @@ class _ArticleDetailsPageState extends State<ArticleDetailsPage> {
             ],
           );
         },
+      ),
+      bottomNavigationBar: _details == null
+          ? null
+          : SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            spacing: 12,
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  iconAlignment: IconAlignment.end,
+                  icon: Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  label: Text(
+                    AppStrings.of(context, _expanded ? 'less' : 'more'),
+                  ),
+                ),
+              ),
+              IconButton.outlined(
+                onPressed: () => openUrl(_details!.original_url),
+                tooltip: AppStrings.of(context, 'open source'),
+                icon: const Icon(Icons.link),
+                style: IconButton.styleFrom(
+                  minimumSize: const Size(48, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
